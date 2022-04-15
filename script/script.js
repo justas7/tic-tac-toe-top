@@ -1,9 +1,10 @@
 "use strict";
 
-const gridItems = document.getElementsByClassName("grid-item");
+let gridItems = document.getElementsByClassName("grid-item");
 const boardContainer = document.querySelector(".gameboard");
-const xoBtns = document.querySelector(".xoBtns-container");
-let game;
+const btns = document.querySelector(".btns-container");
+const playBtn = document.getElementById("playBtn");
+let game; /* do not change name */
 
 /* factory function for creating players */
 
@@ -18,7 +19,6 @@ let gameBoard = (function () {
   let setBoard = function () {
     player1 = createPlayer("X", true);
     player2 = createPlayer("O", false);
-
     board = {
       rows: [
         ["0", "1", "2"],
@@ -35,33 +35,35 @@ let gameBoard = (function () {
         ["2", "4", "6"],
       ],
     };
-
     return { player1, player2, board };
   };
-
   return { setBoard };
 })();
 
 /* display signs on board cells */
 let displayController = (function () {
   let cells = document.querySelectorAll(".grid-item");
-
+  let displayPlayBtn = function () {
+    btns.classList.toggle("hidden");
+  };
   let displaySigns = function () {
     cells.forEach((cell) => {
       let index = cell.getAttribute("data-index");
-
-      if (game.board.rows.flat()[index] === "X" || game.board.rows.flat()[index] === "O") {
+      if (
+        game.board.rows.flat()[index] === game.player1.sign ||
+        game.board.rows.flat()[index] === game.player2.sign
+      ) {
         cell.textContent = `${game.board.rows.flat()[index]}`;
       }
     });
   };
-  return { displaySigns };
+  return { displaySigns, displayPlayBtn };
 })();
 
 game = gameBoard.setBoard();
 
-/* gameplay module, gets players moves, and checks if there is a winner */
-let gameplay = (function () {
+/* sets plays moves into board array and check if there is a winner or tie */
+let checkResults = (function () {
   let _setRows = function (i, sign) {
     game.board.rows.forEach((row) => {
       if (row.includes(i)) {
@@ -69,7 +71,6 @@ let gameplay = (function () {
       }
     });
   };
-
   let _setColumns = function (i, sign) {
     game.board.columns.forEach((column) => {
       if (column.includes(i)) {
@@ -77,7 +78,6 @@ let gameplay = (function () {
       }
     });
   };
-
   let _setDiagonals = function (i, sign) {
     game.board.diagonals.forEach((diagonal) => {
       if (diagonal.includes(i)) {
@@ -85,27 +85,58 @@ let gameplay = (function () {
       }
     });
   };
-
   let _checkRows = function () {
     game.board.rows.forEach((row) => {
-      if (row.every((val) => val === "X") || row.every((val) => val === "O")) {
-        boardContainer.removeEventListener("click", getMove);
+      if (
+        row.every((val) => val === game.player1.sign) ||
+        row.every((val) => val === game.player2.sign)
+      ) {
+        boardContainer.removeEventListener("click", gameplay.getMove);
+        boardContainer.removeEventListener("click", displayController.displaySigns);
+        boardContainer.removeEventListener("click", checkWinner);
+        displayController.displayPlayBtn();
       }
     });
   };
   let _checkColumns = function () {
     game.board.columns.forEach((column) => {
-      if (column.every((val) => val === "X") || column.every((val) => val === "O")) {
-        boardContainer.removeEventListener("click", getMove);
+      if (
+        column.every((val) => val === game.player1.sign) ||
+        column.every((val) => val === game.player2.sign)
+      ) {
+        boardContainer.removeEventListener("click", gameplay.getMove);
+        boardContainer.removeEventListener("click", displayController.displaySigns);
+        boardContainer.removeEventListener("click", checkWinner);
+        displayController.displayPlayBtn();
       }
     });
   };
   let _checkDiagonals = function () {
     game.board.diagonals.forEach((diagonal) => {
-      if (diagonal.every((val) => val === "X") || diagonal.every((val) => val === "O")) {
-        boardContainer.removeEventListener("click", getMove);
+      if (
+        diagonal.every((val) => val === game.player1.sign) ||
+        diagonal.every((val) => val === game.player2.sign)
+      ) {
+        boardContainer.removeEventListener("click", gameplay.getMove);
+        boardContainer.removeEventListener("click", displayController.displaySigns);
+        boardContainer.removeEventListener("click", checkWinner);
+        displayController.displayPlayBtn();
       }
     });
+  };
+  let setBoardSigns = function (i, sign) {
+    _setRows(i, sign);
+    _setColumns(i, sign);
+    _setDiagonals(i, sign);
+  };
+  let checkTie = function () {
+    if (
+      game.board.rows.flat().every((val) => {
+        return val === game.player1.sign || val === game.player2.sign;
+      })
+    ) {
+      displayController.displayPlayBtn();
+    }
   };
 
   let checkWinner = function () {
@@ -113,32 +144,66 @@ let gameplay = (function () {
     _checkColumns();
     _checkDiagonals();
   };
+  return { setBoardSigns, checkWinner, checkTie };
+})();
 
+/* gameplay module, gets players moves, and tracks gameflow */
+let gameplay = (function () {
   let getMove = function (e) {
     let index = e.target.getAttribute("data-index");
-
     if (!game.board.rows.flat().includes(index)) {
       return;
     }
-
     if (game.player1.myTurn) {
-      _setRows(index, game.player1.sign);
-      _setColumns(index, game.player1.sign);
-      _setDiagonals(index, game.player1.sign);
+      checkResults.setBoardSigns(index, game.player1.sign);
     }
     if (game.player2.myTurn) {
-      _setRows(index, game.player2.sign);
-      _setColumns(index, game.player2.sign);
-      _setDiagonals(index, game.player2.sign);
+      checkResults.setBoardSigns(index, game.player2.sign);
     }
-
     game.player1.myTurn = !game.player1.myTurn;
     game.player2.myTurn = !game.player2.myTurn;
   };
+  return { getMove };
+})();
 
-  return { getMove, checkWinner };
+let resetGame = (function () {
+  let reset = function () {
+    displayController.displayPlayBtn();
+    gridItems = [...gridItems];
+    gridItems.forEach((item) => {
+      item.textContent = "";
+    });
+    game = gameBoard.setBoard();
+    boardContainer.addEventListener("click", gameplay.getMove);
+    boardContainer.addEventListener("click", displayController.displaySigns);
+    boardContainer.addEventListener("click", checkResults.checkWinner);
+  };
+  return { reset };
 })();
 
 boardContainer.addEventListener("click", gameplay.getMove);
 boardContainer.addEventListener("click", displayController.displaySigns);
-boardContainer.addEventListener("click", gameplay.checkWinner);
+boardContainer.addEventListener("click", checkResults.checkWinner);
+boardContainer.addEventListener("click", checkResults.checkTie);
+playBtn.addEventListener("click", resetGame.reset);
+
+// let checkTie = function () {
+//   game.board.rows.forEach((arr) => {
+//     console.log(typeof parseInt(arr[0][0]) !== "number");
+//     console.log(arr[0]);
+
+//     arr.every((val) => {
+//       console.log(typeof parseInt(val) !== "number");
+
+//       if (typeof parseInt(val) !== "number") {
+//         console.log("Its a tie");
+
+//         displayController.displayPlayBtn();
+//       }
+//     });
+//   });
+// };
+
+// checkTie();
+
+console.log(parseInt("0"));

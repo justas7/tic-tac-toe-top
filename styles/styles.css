@@ -28,7 +28,7 @@ body {
   min-height: 100vh;
 }
 
-.xoBtns-container {
+.btns-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -38,7 +38,7 @@ body {
   z-index: 2;
 }
 
-.xoBtns-container > button {
+.btns-container > button {
   background-color: var(--color-one);
   color: var(--color-two);
   border: 0.1px solid var(--color-two);
@@ -53,12 +53,12 @@ body {
   display: none;
 }
 
-.xoBtns-container > button:hover {
+.btns-container > button:hover {
   text-shadow: 1px 1px 10px var(--color-two);
   box-shadow: 1px 1px 10px var(--color-two);
 }
 
-.xoBtns-container > button:active {
+.btns-container > button:active {
   transform: translate(2px, -5px);
 }
 
