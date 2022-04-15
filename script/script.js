@@ -2,7 +2,8 @@
 
 let gridItems = document.getElementsByClassName("grid-item");
 const boardContainer = document.querySelector(".gameboard");
-const btns = document.querySelector(".btns-container");
+const endgameContainer = document.querySelector(".endgame-container");
+const winnerContainer = document.querySelector(".winner-container");
 const playBtn = document.getElementById("playBtn");
 let game; /* do not change name */
 
@@ -43,8 +44,13 @@ let gameBoard = (function () {
 /* display signs on board cells */
 let displayController = (function () {
   let cells = document.querySelectorAll(".grid-item");
+
+  let displayWinner = function (winner) {
+    winnerContainer.textContent = `${winner} won`;
+  };
+
   let displayPlayBtn = function () {
-    btns.classList.toggle("hidden");
+    endgameContainer.classList.toggle("hidden");
   };
   let displaySigns = function () {
     cells.forEach((cell) => {
@@ -57,13 +63,14 @@ let displayController = (function () {
       }
     });
   };
-  return { displaySigns, displayPlayBtn };
+  return { displaySigns, displayPlayBtn, displayWinner };
 })();
 
 game = gameBoard.setBoard();
 
 /* sets plays moves into board array and check if there is a winner or tie */
 let checkResults = (function () {
+  /** places playrs signs into board array */
   let _setRows = function (i, sign) {
     game.board.rows.forEach((row) => {
       if (row.includes(i)) {
@@ -85,15 +92,23 @@ let checkResults = (function () {
       }
     });
   };
+
+  /** Checks if there there is a winner in rows columns or diagonals arrays */
   let _checkRows = function () {
     game.board.rows.forEach((row) => {
       if (
         row.every((val) => val === game.player1.sign) ||
         row.every((val) => val === game.player2.sign)
       ) {
+        if (row.every((val) => val === game.player1.sign)) {
+          displayController.displayWinner(game.player1.sign);
+        } else {
+          displayController.displayWinner(game.player2.sign);
+        }
         boardContainer.removeEventListener("click", gameplay.getMove);
         boardContainer.removeEventListener("click", displayController.displaySigns);
         boardContainer.removeEventListener("click", checkWinner);
+        boardContainer.removeEventListener("click", checkResults.checkTie);
         displayController.displayPlayBtn();
       }
     });
@@ -104,9 +119,16 @@ let checkResults = (function () {
         column.every((val) => val === game.player1.sign) ||
         column.every((val) => val === game.player2.sign)
       ) {
+        if (column.every((val) => val === game.player1.sign)) {
+          displayController.displayWinner(game.player1.sign);
+        } else {
+          displayController.displayWinner(game.player2.sign);
+        }
+
         boardContainer.removeEventListener("click", gameplay.getMove);
         boardContainer.removeEventListener("click", displayController.displaySigns);
         boardContainer.removeEventListener("click", checkWinner);
+        boardContainer.removeEventListener("click", checkResults.checkTie);
         displayController.displayPlayBtn();
       }
     });
@@ -117,13 +139,20 @@ let checkResults = (function () {
         diagonal.every((val) => val === game.player1.sign) ||
         diagonal.every((val) => val === game.player2.sign)
       ) {
+        if (diagonal.every((val) => val === game.player1.sign)) {
+          displayController.displayWinner(game.player1.sign);
+        } else {
+          displayController.displayWinner(game.player2.sign);
+        }
         boardContainer.removeEventListener("click", gameplay.getMove);
         boardContainer.removeEventListener("click", displayController.displaySigns);
         boardContainer.removeEventListener("click", checkWinner);
+        boardContainer.removeEventListener("click", checkResults.checkTie);
         displayController.displayPlayBtn();
       }
     });
   };
+
   let setBoardSigns = function (i, sign) {
     _setRows(i, sign);
     _setColumns(i, sign);
@@ -135,6 +164,7 @@ let checkResults = (function () {
         return val === game.player1.sign || val === game.player2.sign;
       })
     ) {
+      winnerContainer.textContent = `It's a Tie`;
       displayController.displayPlayBtn();
     }
   };
@@ -173,37 +203,19 @@ let resetGame = (function () {
     gridItems.forEach((item) => {
       item.textContent = "";
     });
+    winnerContainer.textContent = "";
     game = gameBoard.setBoard();
     boardContainer.addEventListener("click", gameplay.getMove);
     boardContainer.addEventListener("click", displayController.displaySigns);
     boardContainer.addEventListener("click", checkResults.checkWinner);
+    boardContainer.addEventListener("click", checkResults.checkTie);
   };
   return { reset };
 })();
 
 boardContainer.addEventListener("click", gameplay.getMove);
 boardContainer.addEventListener("click", displayController.displaySigns);
+
 boardContainer.addEventListener("click", checkResults.checkWinner);
 boardContainer.addEventListener("click", checkResults.checkTie);
 playBtn.addEventListener("click", resetGame.reset);
-
-// let checkTie = function () {
-//   game.board.rows.forEach((arr) => {
-//     console.log(typeof parseInt(arr[0][0]) !== "number");
-//     console.log(arr[0]);
-
-//     arr.every((val) => {
-//       console.log(typeof parseInt(val) !== "number");
-
-//       if (typeof parseInt(val) !== "number") {
-//         console.log("Its a tie");
-
-//         displayController.displayPlayBtn();
-//       }
-//     });
-//   });
-// };
-
-// checkTie();
-
-console.log(parseInt("0"));

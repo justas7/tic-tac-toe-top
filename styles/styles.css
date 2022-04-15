@@ -28,8 +28,9 @@ body {
   min-height: 100vh;
 }
 
-.btns-container {
+.endgame-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
@@ -38,11 +39,19 @@ body {
   z-index: 2;
 }
 
-.btns-container > button {
+.winner-container {
+  color: var(--color-two);
+  font-weight: 700;
+  z-index: 3;
+  font-size: 3rem;
+}
+
+.endgame-container > button {
   background-color: var(--color-one);
   color: var(--color-two);
   border: 0.1px solid var(--color-two);
   padding: 20px;
+  margin: 40px;
   height: 100px;
   border-radius: 25px;
   font-size: 2rem;
@@ -53,12 +62,12 @@ body {
   display: none;
 }
 
-.btns-container > button:hover {
+.endgame-container > button:hover {
   text-shadow: 1px 1px 10px var(--color-two);
   box-shadow: 1px 1px 10px var(--color-two);
 }
 
-.btns-container > button:active {
+.endgame-container > button:active {
   transform: translate(2px, -5px);
 }
 
