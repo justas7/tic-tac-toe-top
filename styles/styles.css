@@ -1,0 +1,103 @@
+html {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  -webkit-box-sizing: inherit;
+  -moz-box-sizing: inherit;
+  box-sizing: inherit;
+}
+
+:root {
+  --color-one: #083c5d; /* background color */
+  --color-two: #d9b310;
+
+  font-family: Arial, "Times New Roman", Georgia, Times, serif;
+}
+
+body {
+  background-color: var(--color-one);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.endgame-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  min-width: 100vw;
+  position: absolute;
+  z-index: 2;
+}
+
+.winner-container {
+  color: var(--color-two);
+  font-weight: 700;
+  z-index: 3;
+  font-size: 3rem;
+}
+
+.endgame-container > button {
+  background-color: var(--color-one);
+  color: var(--color-two);
+  border: 0.1px solid var(--color-two);
+  padding: 20px;
+  margin: 40px;
+  height: 100px;
+  border-radius: 25px;
+  font-size: 2rem;
+  outline: 9999px solid rgba(0, 0, 0, 0.8);
+}
+
+.hidden {
+  display: none;
+}
+
+.endgame-container > button:hover {
+  text-shadow: 1px 1px 10px var(--color-two);
+  box-shadow: 1px 1px 10px var(--color-two);
+}
+
+.endgame-container > button:active {
+  transform: translate(2px, -5px);
+}
+
+.gameboard {
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  height: 500px;
+  width: 500px;
+}
+
+.grid-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5rem;
+  color: var(--color-two);
+}
+
+.gameboard > .grid-item:nth-child(-n + 3) {
+  border-bottom: 1px solid var(--color-two);
+}
+.gameboard > .grid-item:nth-child(n + 7) {
+  border-top: 1px solid var(--color-two);
+}
+
+.gameboard > .grid-item:nth-child(3n + 1) {
+  border-right: 1px solid var(--color-two);
+}
+
+.gameboard > .grid-item:nth-child(3n + 3) {
+  border-left: 1px solid var(--color-two);
+}
